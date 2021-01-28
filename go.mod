@@ -1,4 +1,4 @@
-module github.com/benefitj/simulator-go
+module github.com/benefitj/benefitgo-commons
 
 go 1.15
 

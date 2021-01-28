@@ -294,17 +294,17 @@ func BytesToInt64LE(bytes []byte, signed bool) int64 {
 // BytesToBinary 字节数组转换成二进制字符串，bytes为字节数组，split为分隔符，size为分割的长度
 func BytesToBinary(bytes []byte, split string, size int) string {
 	var sb strings.Builder
-	for i := 0; i < len(bytes); i++ {
+	size = max(size, 0)
+	for i, j := 0, 0; i < len(bytes); i, j = i+1, j+1 {
+		// 分割
+		if size > 0 && i > 0 && j == size {
+			sb.WriteString(split)
+			j = 0
+		}
 		// 高四位
 		sb.WriteString(binaryStrings[(bytes[i]&0xF0)>>4])
 		// 低四位
 		sb.WriteString(binaryStrings[bytes[i]&0x0F])
-		// 分割
-		if i%size == 0 {
-			if i > 0 && i < len(bytes)-1 {
-				sb.WriteString(split)
-			}
-		}
 	}
 	return sb.String()
 }
@@ -327,19 +327,18 @@ func BytesToCustomHex(bytes []byte, lowerCase bool, prefix string, suffix string
 	} else {
 		hex = hexUpperCase
 	}
-	var split = max(length, 1)
 	var sb strings.Builder
 	for i, j := 0, 1; i < len(bytes); i, j = i+1, j+1 {
 		var b = bytes[i]
 		// 填充前缀
-		if i%split == 0 {
+		if length > 0 && i%length == 0 {
 			sb.WriteString(prefix)
 		}
 		// 原16进制数据
 		sb.WriteRune(hex[((b & 0xF0) >> 4)])
 		sb.WriteRune(hex[(b & 0x0F)])
 		// 填充后缀
-		if i < (len(bytes)-1) && (j%split == 0) {
+		if length > 0 && i < (len(bytes)-1) && (j%length == 0) {
 			sb.WriteString(suffix)
 		}
 	}
